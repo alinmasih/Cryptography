@@ -9,26 +9,6 @@ This project is a full-stack application designed to demonstrate a multi-layered
 2.  **Vigenère Cipher**: Secondary encryption using a secret key.
 3.  **Attribute-Based Access Control**: Implementation of access policies that govern who can decrypt the final ciphertext.
 
-## 📁 Project Structure
-
-```text
-.
-├── backend/            # Node.js + Express API
-│   ├── src/
-│   │   ├── abe/        # Access Control logic
-│   │   ├── ciphers/    # Polybius and Vigenère implementations
-│   │   ├── services/   # Hybrid encryption orchestration
-│   │   └── server.js   # Express server entry point
-│   └── package.json
-├── frontend/           # React + Vite Application
-│   ├── src/
-│   │   ├── components/ # UI components (Encryption, Decryption, Stepper)
-│   │   ├── App.jsx     # Main application logic
-│   │   └── index.css   # Global styles
-│   └── package.json
-├── package.json        # Root package.json (Workspaces)
-└── README.md
-```
 
 ## 🛠️ Tech Stack
 
@@ -81,6 +61,3 @@ You can run both parts from the root directory using the following scripts:
     - A receiver must provide the correct secret key.
     - The receiver's attributes must match the policy embedded in the encryption for successful decryption.
 
-## 📜 License
-
-This project is for academic/personal use. Please see individual files for specific implementation details.
