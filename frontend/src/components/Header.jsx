@@ -1,4 +1,3 @@
-import React from 'react';
 import { Shield } from 'lucide-react';
 
 export default function Header() {
@@ -8,8 +7,8 @@ export default function Header() {
         <Shield size={32} />
       </div>
       <div className="title-group">
-        <h1>Secure Data Encryption Portal</h1>
-        <p>Attribute-Based Hybrid Cryptography System</p>
+        <h1>ABE: Public-Key Cryptography</h1>
+        <p>A Hybrid Approach Using Polybius and Vigenere Cipher</p>
       </div>
     </header>
   );

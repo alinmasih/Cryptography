@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Copy, ArrowRight, CheckCircle } from 'lucide-react';
 
 export default function OutputPage({ data, onProceed }) {

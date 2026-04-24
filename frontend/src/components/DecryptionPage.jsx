@@ -1,25 +1,61 @@
-import React, { useState } from 'react';
-import { ShieldCheck, XCircle, Unlock, Key, Tag, FileText } from 'lucide-react';
+import { useState } from 'react';
+import { ShieldCheck, XCircle, Unlock, Key, Tag, FileText, RefreshCw } from 'lucide-react';
+import { API_BASE_URL } from '../config';
+
+const keyPattern = /^[A-Za-z]+$/;
 
 export default function DecryptionPage({ originalData }) {
-  const [ciphertext, setCiphertext] = useState('');
-  const [secretKey, setSecretKey] = useState('');
+  const [ciphertext, setCiphertext] = useState(() => originalData?.ciphertext || '');
+  const [secretKey, setSecretKey] = useState(() => originalData?.secretKey || '');
   const [attribute, setAttribute] = useState('');
+  const [requiredAttribute, setRequiredAttribute] = useState(() => originalData?.attribute || '');
   const [result, setResult] = useState(null);
+
+  const handleUsePrevious = () => {
+    if (!originalData) {
+      return;
+    }
+
+    setCiphertext(originalData.ciphertext || '');
+    setSecretKey(originalData.secretKey || '');
+    setRequiredAttribute(originalData.attribute || '');
+    setResult(null);
+  };
 
   const handleDecrypt = async (e) => {
     e.preventDefault();
-    if (!ciphertext || !secretKey || !attribute) return;
+
+    const normalizedKey = secretKey.trim();
+    const normalizedAttribute = attribute.trim().toLowerCase();
+    const normalizedRequiredAttribute = requiredAttribute.trim().toLowerCase();
+
+    if (!ciphertext || !normalizedKey || !normalizedAttribute || !normalizedRequiredAttribute) {
+      setResult({
+        status: 'error',
+        message: 'Missing Input',
+        desc: 'Ciphertext, key, user attribute, and required policy attribute are all mandatory.'
+      });
+      return;
+    }
+
+    if (!keyPattern.test(normalizedKey)) {
+      setResult({
+        status: 'error',
+        message: 'Invalid Key',
+        desc: 'Vigenere key must use alphabetic characters only (A-Z).'
+      });
+      return;
+    }
 
     try {
-      const response = await fetch('http://localhost:5001/decrypt', {
+      const response = await fetch(`${API_BASE_URL}/decrypt`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ciphertext,
-          key: secretKey,
-          userAttributes: { role: attribute.toLowerCase() },
-          policy: { role: originalData?.attribute?.toLowerCase() || attribute.toLowerCase() } 
+          key: normalizedKey,
+          userAttributes: { role: normalizedAttribute },
+          policy: { role: normalizedRequiredAttribute }
         })
       });
       const data = await response.json();
@@ -57,7 +93,10 @@ export default function DecryptionPage({ originalData }) {
             className="form-control"
             placeholder="Paste the encrypted message here"
             value={ciphertext}
-            onChange={(e) => setCiphertext(e.target.value)}
+            onChange={(e) => {
+              setCiphertext(e.target.value);
+              setResult(null);
+            }}
             required
           />
         </div>
@@ -69,14 +108,35 @@ export default function DecryptionPage({ originalData }) {
             className="form-control"
             placeholder="Enter decryption key"
             value={secretKey}
-            onChange={(e) => setSecretKey(e.target.value)}
+            onChange={(e) => {
+              setSecretKey(e.target.value);
+              setResult(null);
+            }}
+            pattern="[A-Za-z]+"
+            title="Use alphabetic characters only"
             required
           />
         </div>
 
         <hr className="card-divider" />
 
-        <h2><Tag size={24} /> User Attribute for Access Verification</h2>
+        <h2><Tag size={24} /> Policy and User Attribute Verification</h2>
+
+        <div className="form-group">
+          <label className="form-label"><Tag size={16} /> Required Policy Attribute</label>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Required role from encryption policy"
+            value={requiredAttribute}
+            onChange={(e) => {
+              setRequiredAttribute(e.target.value);
+              setResult(null);
+            }}
+            readOnly={Boolean(originalData?.attribute)}
+            required
+          />
+        </div>
 
         <div className="form-group">
           <label className="form-label"><ShieldCheck size={16} /> Verification Attribute</label>
@@ -85,10 +145,22 @@ export default function DecryptionPage({ originalData }) {
             className="form-control"
             placeholder="Enter your attribute"
             value={attribute}
-            onChange={(e) => setAttribute(e.target.value)}
+            onChange={(e) => {
+              setAttribute(e.target.value);
+              setResult(null);
+            }}
             required
           />
         </div>
+
+        {originalData && (
+          <div className="action-buttons" style={{ marginTop: '1rem' }}>
+            <button type="button" className="btn btn-secondary" onClick={handleUsePrevious}>
+              <RefreshCw size={16} style={{ marginRight: '8px' }} />
+              Use Previous Encryption Output
+            </button>
+          </div>
+        )}
 
         <div style={{ marginTop: '2rem' }}>
           <button type="submit" className="btn btn-primary">

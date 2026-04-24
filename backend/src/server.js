@@ -13,7 +13,7 @@ app.get('/', (req, res) => {
   res.send('ABE Hybrid Encryption System Backend Running');
 });
 
-const PORT = 5001;
+const PORT = Number(process.env.PORT) || 5001;
 
 app.listen(PORT, () => {
   console.log(`ABE Backend server running on port ${PORT}`);

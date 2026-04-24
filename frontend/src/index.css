@@ -383,6 +383,14 @@ textarea.form-control {
   transition: all 0.3s ease;
 }
 
+.step.disabled {
+  opacity: 0.45;
+}
+
+.step.disabled .step-number {
+  border-color: #1f2937;
+}
+
 .step-label {
   font-size: 0.9rem;
   font-weight: 500;

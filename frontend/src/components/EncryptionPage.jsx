@@ -1,5 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Lock, FileText, Key, Shield, Info, Tag, Cpu, ArrowDown, Network, ArrowRight } from 'lucide-react';
+import { API_BASE_URL } from '../config';
+
+const keyPattern = /^[A-Za-z]+$/;
 
 export default function EncryptionPage({ onEncrypt }) {
   const [plaintext, setPlaintext] = useState('');
@@ -13,14 +16,22 @@ export default function EncryptionPage({ onEncrypt }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (plaintext && secretKey && attribute) {
+      const normalizedKey = secretKey.trim();
+      const normalizedAttribute = attribute.trim().toLowerCase();
+
+      if (!keyPattern.test(normalizedKey)) {
+        alert('Invalid key: Vigenere key must use alphabetic characters only (A-Z).');
+        return;
+      }
+
       try {
-        const response = await fetch('http://localhost:5001/encrypt', {
+        const response = await fetch(`${API_BASE_URL}/encrypt`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             plaintext,
-            key: secretKey,
-            policy: { role: attribute }
+            key: normalizedKey,
+            policy: { role: normalizedAttribute }
           })
         });
         const data = await response.json();
@@ -30,8 +41,9 @@ export default function EncryptionPage({ onEncrypt }) {
             plaintext,
             polybiusOutput: data.polybiusOutput,
             ciphertext: data.ciphertext,
-            attribute,
-            secretKey
+            attribute: normalizedAttribute,
+            secretKey: normalizedKey,
+            policy: data.policy
           };
           setEncryptionData(resultData);
           setIsProcessing(true);
@@ -70,7 +82,6 @@ export default function EncryptionPage({ onEncrypt }) {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center' }}>
           
-          {}
           <div className="process-box fade-in" style={{ width: '100%', maxWidth: '500px', backgroundColor: 'var(--surface-color)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)', position: 'relative' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', color: '#10b981' }}>
               <Cpu size={20} />
@@ -88,7 +99,6 @@ export default function EncryptionPage({ onEncrypt }) {
             <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', width: '100%' }}>
               <ArrowDown size={32} color="var(--primary-color)" style={{ opacity: 0.7 }} />
 
-              {}
               <div className="process-box" style={{ width: '100%', maxWidth: '500px', backgroundColor: 'var(--surface-color)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--primary-color)', position: 'relative', boxShadow: '0 0 15px rgba(59, 130, 246, 0.1)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', color: 'var(--primary-color)' }}>
                   <Lock size={20} />
@@ -147,9 +157,11 @@ export default function EncryptionPage({ onEncrypt }) {
           <input
             type="text"
             className="form-control"
-            placeholder="Enter encryption key"
+            placeholder="Enter encryption key (letters only)"
             value={secretKey}
             onChange={(e) => setSecretKey(e.target.value)}
+            pattern="[A-Za-z]+"
+            title="Use alphabetic characters only"
             required
           />
         </div>

@@ -1,6 +1,6 @@
-# Attribute-Based Hybrid Encryption System (ABE-HES)
+# ABE: Public-Key Cryptography - A Hybrid Approach Using Polybius and Vigenere Cipher
 
-A secure cryptographic system that combines classical ciphers (Polybius and Vigenère) with Ciphertext-Policy Attribute-Based Access Control (CP-ABAC). This system ensures that data is encrypted using a hybrid approach and can only be decrypted by users whose attributes satisfy a specific access policy.
+A secure cryptographic system that combines classical ciphers (Polybius and Vigenere) with Ciphertext-Policy Attribute-Based Access Control (CP-ABAC). This system ensures that data is encrypted using a hybrid approach and can only be decrypted by users whose attributes satisfy a specific access policy.
 
 ## 🚀 Project Overview
 
@@ -50,13 +50,24 @@ You can run both parts from the root directory using the following scripts:
    npm run dev:backend
    ```
 
+### Frontend API Configuration
+
+The frontend reads backend URL from `VITE_API_BASE_URL`.
+
+1. Create `frontend/.env` (or copy from `frontend/.env.example`)
+2. Set:
+   ```bash
+   VITE_API_BASE_URL=http://localhost:5001
+   ```
+
 ## 🔐 Cryptography Workflow
 
 1.  **Plaintext Input**: The user provides the message to be encrypted.
 2.  **Policy Definition**: An access policy is assigned (e.g., `role: "admin", department: "security"`).
 3.  **Hybrid Encryption**:
     - The message is first processed via a **Polybius Square**.
-    - The result is then encrypted using the **Vigenère Cipher** with a user-provided secret key.
+   - The result is then encrypted using the **Vigenere Cipher** with a user-provided secret key.
+   - The Vigenere stage transforms printable ASCII data, so special characters in the encrypted stream are also protected.
 4.  **Decryption & Access**:
     - A receiver must provide the correct secret key.
     - The receiver's attributes must match the policy embedded in the encryption for successful decryption.
