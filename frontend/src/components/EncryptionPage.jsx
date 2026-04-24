@@ -14,7 +14,7 @@ export default function EncryptionPage({ onEncrypt }) {
     e.preventDefault();
     if (plaintext && secretKey && attribute) {
       try {
-        const response = await fetch('http:
+        const response = await fetch('http://localhost:5001/encrypt', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
